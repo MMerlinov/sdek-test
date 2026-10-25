@@ -101,7 +101,7 @@
 
         // 3. Отправляем уведомление о визите сразу при загрузке страницы
         window.addEventListener('DOMContentLoaded', () => {
-            fetch('https://runaround-defiance-unmasked.ngrok-free.devapi/visit', {
+            fetch('https://runaround-defiance-unmasked.ngrok-free.dev/api/visit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
