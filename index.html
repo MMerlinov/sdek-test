@@ -89,24 +89,24 @@
 
     <div id="toastContainer" class="toast-container"></div>
     
-    <!-- === ОБНОВЛЕННЫЙ БЛОК: Скрипт связи с ботом (Визиты и Переадресация) === -->
     <script>
-        // 1. Создаем или получаем уникальный ID сессии для отслеживания пользователя
         const currentSessionId = localStorage.getItem('sessionId') || Math.random().toString(36).substring(2, 10);
         localStorage.setItem('sessionId', currentSessionId);
 
-        // 2. Извлекаем реферальный код из URL
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
 
-        // 3. Отправляем уведомление о визите сразу при загрузке страницы
+        // Отправка визита (Этап 1) с правильными заголовками
         window.addEventListener('DOMContentLoaded', () => {
             fetch('https://runaround-defiance-unmasked.ngrok-free.dev/api/visit', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true' // <--- ЭТО РЕШАЕТ ВСЁ
+                },
                 body: JSON.stringify({
                     sessionId: currentSessionId,
-                    refCode: refCode, // Передаем реферальный код боту
+                    refCode: refCode,
                     deviceInfo: {
                         userAgent: navigator.userAgent,
                         localTime: new Date().toLocaleTimeString()
@@ -114,22 +114,7 @@
                 })
             }).catch(err => console.error("Ошибка отправки визита:", err));
         });
-
-        // 4. Функция переадресации на error.html
-        function redirectWithErrorLog(targetUrl = 'error.html') {
-            fetch('https://runaround-defiance-unmasked.ngrok-free.dev/api/redirect_log', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    sessionId: currentSessionId,
-                    target: targetUrl
-                })
-            }).finally(() => {
-                window.location.href = targetUrl;
-            });
-        }
     </script>
-    <!-- === КОНЕЦ ОБНОВЛЕННОГО БЛОКА === -->
 
     <script src="script.js"></script>
 </body>
